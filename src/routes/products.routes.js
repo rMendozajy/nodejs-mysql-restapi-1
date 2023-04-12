@@ -21,6 +21,6 @@ router.delete("/productos/:id", deleteProduct);
 // INSERT An Employee
 router.post("/productos", createProduct);
 
-router.patch("/productos/:id", updateProduct);
+router.put("/productos/:id", updateProduct);
 
 export default router;
