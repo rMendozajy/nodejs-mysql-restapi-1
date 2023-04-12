@@ -14,7 +14,7 @@ export const getProduct = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res
-      .status(202)
+      .status(404)
       .json({ message: "eEter the id in the parameters please." });
   }
   try {
@@ -37,7 +37,7 @@ export const deleteProduct = async (req, res) => {
 
   if (!id) {
     return res
-      .status(202)
+      .status(404)
       .json({ message: "eEter the id in the parameters please." });
   }
 
@@ -47,7 +47,7 @@ export const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    res.sendStatus(204).json({
+    res.sendStatus(202).json({
       message: "Product delete successfully",
     });
   } catch (error) {
@@ -80,8 +80,8 @@ export const updateProduct = async (req, res) => {
   const { name, description, price, stock } = req.body;
   if (!id) {
     return res
-      .status(202)
-      .json({ message: "eEter the id in the parameters please." });
+      .status(404)
+      .json({ message: "Enter the id in the parameters please." });
   }
   if ((name, description, price, stock)) {
     try {
