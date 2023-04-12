@@ -36,7 +36,9 @@ export const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    res.sendStatus(204);
+    res.sendStatus(204).json({
+      message: "Product delete successfully",
+    });
   } catch (error) {
     return res.status(500).json({ message: "Something goes wrong" });
   }
