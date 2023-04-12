@@ -11,8 +11,13 @@ export const getProducts = async (req, res) => {
 };
 
 export const getProduct = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res
+      .status(202)
+      .json({ message: "eEter the id in the parameters please." });
+  }
   try {
-    const { id } = req.params;
     const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
       id,
     ]);
@@ -28,10 +33,16 @@ export const getProduct = async (req, res) => {
 };
 
 export const deleteProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const [rows] = await pool.query("DELETE FROM products WHERE id = ?", [id]);
+  const { id } = req.params;
 
+  if (!id) {
+    return res
+      .status(202)
+      .json({ message: "eEter the id in the parameters please." });
+  }
+
+  try {
+    const [rows] = await pool.query("DELETE FROM products WHERE id = ?", [id]);
     if (rows.affectedRows <= 0) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -45,39 +56,50 @@ export const deleteProduct = async (req, res) => {
 };
 
 export const createProduct = async (req, res) => {
-  try {
-    const { name, description, price, stock } = req.body;
-    const [rows] = await pool.query(
-      "INSERT INTO products (name, description, price, stock) VALUES (?, ?, ?, ?)",
-      [name, description, price, stock]
-    );
-    res
-      .status(201)
-      .json({ id: rows.insertId, name, description, price, stock });
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
+  const { name, description, price, stock } = req.body;
+
+  if ((name, description, price, stock)) {
+    try {
+      const [rows] = await pool.query(
+        "INSERT INTO products (name, description, price, stock) VALUES (?, ?, ?, ?)",
+        [name, description, price, stock]
+      );
+      res
+        .status(201)
+        .json({ id: rows.insertId, name, description, price, stock });
+    } catch (error) {
+      return res.status(500).json({ message: "Something goes wrong" });
+    }
+  } else {
+    return res.status(202).json({ message: "The data is empty" });
   }
 };
 
 export const updateProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, description, price, stock } = req.body;
+  const { id } = req.params;
+  const { name, description, price, stock } = req.body;
+  if (!id) {
+    return res
+      .status(202)
+      .json({ message: "eEter the id in the parameters please." });
+  }
+  if ((name, description, price, stock)) {
+    try {
+      const [result] = await pool.query(
+        "UPDATE products SET name = IFNULL(?, name), description = IFNULL(?, description), price = IFNULL(?, price), stock = IFNULL(?, stock)  WHERE id = ?",
+        [name, description, price, stock, id]
+      );
+      if (result.affectedRows === 0)
+        return res.status(404).json({ message: "Product not found" });
+      const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
+        id,
+      ]);
 
-    const [result] = await pool.query(
-      "UPDATE products SET name = IFNULL(?, name), description = IFNULL(?, description), price = IFNULL(?, price), stock = IFNULL(?, stock)  WHERE id = ?",
-      [name, description, price, stock, id]
-    );
-
-    if (result.affectedRows === 0)
-      return res.status(404).json({ message: "Product not found" });
-
-    const [rows] = await pool.query("SELECT * FROM products WHERE id = ?", [
-      id,
-    ]);
-
-    res.json(rows[0]);
-  } catch (error) {
-    return res.status(500).json({ message: "Something goes wrong" });
+      res.json(rows[0]);
+    } catch (error) {
+      return res.status(500).json({ message: "Something goes wrong" });
+    }
+  } else {
+    return res.status(202).json({ message: "The data is empty" });
   }
 };
